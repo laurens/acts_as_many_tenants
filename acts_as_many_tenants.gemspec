@@ -7,14 +7,14 @@ require "acts_as_many_tenants/version"
 Gem::Specification.new do |s|
   s.name        = "acts_as_many_tenants"
   s.version     = ActsAsManyTenants::VERSION
-  s.authors     = ["TODO: Your name"]
-  s.email       = ["TODO: Your email"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of ActsAsManyTenants."
-  s.description = "TODO: Description of ActsAsManyTenants."
+  s.authors     = ["Laurens Nienhaus"]
+  s.email       = ["l.nienhaus@gmail.com"]
+  s.homepage    = "http://asdfasdf.de"
+  s.summary     = "Many to many relationships for acts_as_tenant"
+  s.description = "Based on the acts_as_tenant gem, this gem allows for a model to belong to many tenants."
 
-  s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.rdoc"]
-  s.test_files = Dir["test/**/*"]
+  s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
+  s.test_files = Dir["spec/**/*"]
 
   s.add_dependency "rails", "~> 3.2.11"
   s.add_dependency "acts_as_tenant"

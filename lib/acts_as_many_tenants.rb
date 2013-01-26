@@ -29,10 +29,11 @@ module ActsAsManyTenants
       # set the default_scope to scope to current tenant
       unless options[:through]
         default_scope lambda {
-          # using EXISTS query here, 
-          # using joins() ActiveRecord returns ReadOnly records
-          where("EXISTS (select 1 from #{reflection.options[:join_table]} where #{reflection.foreign_key} = #{self.table_name}.id AND #{fkey} = ?)", ActsAsTenant.current_tenant.id) if ActsAsTenant.current_tenant
-          # joins(association).where(association => {:id => ActsAsTenant.current_tenant.id}) if ActsAsTenant.current_tenant
+          if ActsAsTenant.current_tenant
+            # using EXISTS query here, 
+            # not using joins() since that would give us ReadOnly records
+            where("EXISTS (SELECT 1 from #{reflection.options[:join_table]} WHERE #{reflection.foreign_key} = #{self.table_name}.id AND #{fkey} = ?)", ActsAsTenant.current_tenant.id)
+          end
         }
       else
         raise "TODO default_scope for has_many :through associations"

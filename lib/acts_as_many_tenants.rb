@@ -3,7 +3,7 @@ module ActsAsManyTenants
   
   module ClassMethods
     def acts_as_many_tenants(association = :accounts, options = {})
-      options.reverse_merge!({:through => false, :required => false, :immutable => true})
+      options.reverse_merge!({:through => false, :required => false, :immutable => true, :auto => true})
 
       # e.g. account_ids
       singular_ids = "#{association.to_s.singularize}_ids"
@@ -21,6 +21,14 @@ module ActsAsManyTenants
       else
         has_and_belongs_to_many association
         reflection = reflect_on_association(association)
+      end
+
+      if options[:auto]
+        before_validation Proc.new { |m|
+          return unless ActsAsTenant.current_tenant
+          return if m.send(association.to_sym).present?
+          m.send "#{association}=".to_sym, [ActsAsTenant.current_tenant]
+        }, :on => :create
       end
 
       if options[:immutable]

@@ -25,7 +25,12 @@ end
 
 class Bill < ActiveRecord::Base
   attr_accessible :name
-  acts_as_many_tenants :accounts, :required => true
+  acts_as_many_tenants :accounts, :auto => false
+end
+
+class Thing < ActiveRecord::Base
+  attr_accessible :name
+  acts_as_many_tenants :accounts, :auto => false, :required => true
 end
 
 
@@ -163,18 +168,38 @@ describe ActsAsManyTenants do
   #     @tasks.should == [@task2, @task3, @task4] 
   #   end
   # end
-  
-  describe "projects should not validate presence of a tenant" do
+
+  describe "newly created projects should get current_tenant assigned if no tenant is specified" do
     before do
-      @project1 = Project.new(:name => 'foobar')
+      @account1 = Account.create!(:name => 'foo')
+      ActsAsTenant.current_tenant= @account1
+
+      @project1 = Project.create!(:name => 'foobar')
+    end
+
+    it { @project1.accounts.length.should == 1  }
+    it { @project1.accounts.should == [@account1]  }
+  end
+
+  describe "newly created bills should have no tenant assigned" do
+    before do
+      @project1 = Bill.create!(:name => 'foobar')
+    end
+
+    it { @project1.should be_valid  }
+  end
+
+  describe "bills should not validate presence of a tenant" do
+    before do
+      @project1 = Bill.new(:name => 'foobar')
     end
     
     it { @project1.should be_valid  }
   end
 
-  describe "bills should validate presence of a tenant" do
+  describe "things should validate presence of a tenant" do
     before do
-      @bill1 = Bill.new(:name => 'foobar')
+      @bill1 = Thing.new(:name => 'foobar')
     end
     
     it do

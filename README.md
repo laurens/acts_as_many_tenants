@@ -37,4 +37,6 @@ and run
 
 ## TODO
 
-- Make associations immutable (in order to align with `acts_as_tenant`)
+Make associations immutable in order to align with `acts_as_tenant`. 
+At the moment only the `association=[model]` and `association_ids=ids` methods take care of that. Missing implementation for 
+the other association writers `associations.<<(model)`, `associations.delete(model)`, `associations.clear`, `associations.build`, `associations.create`.

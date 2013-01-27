@@ -4,26 +4,48 @@ module ActsAsManyTenants
   module ClassMethods
     def acts_as_many_tenants(association = :accounts, options = {})
       options.reverse_merge!({:through => false, :required => false, :immutable => true})
-      
+
+      # e.g. account_ids
+      singular_ids = "#{association.to_s.singularize}_ids"
+
       if options[:through]
+        # 'foo/bar_baz' -> Foo::BarBaz
+        through_model = options[:through].to_s.camelize.constantize
+
+        # 'foo/bar_baz' -> :bar_baz
+        through_association_name = options[:through].to_s.camelize.demodulize.underscore.to_sym
+
         has_many association, :through => options[:through]
-        # namespaced Model constant: foo/bar_baz -> Foo::BarBaz
-        reflection = options[:through].to_s.camelize.constantize.reflect_on_association(association)
-        # foo/bar_baz -> Foo::BarBaz -> BarBaz -> bar_baz -> :bar_baz
-        through_reflection = reflect_on_association(options[:through].to_s.camelize.demodulize.underscore.to_sym)
+        reflection = through_model.reflect_on_association(association)
+        through_reflection = reflect_on_association(through_association_name)
       else
         has_and_belongs_to_many association
         reflection = reflect_on_association(association)
       end
 
       if options[:immutable]
-        Rails.logger.info "TODO immutable association not yet implemented"
+        define_method "#{singular_ids}=" do |ids|
+          if new_record?
+            super(ids) 
+          else
+            raise "#{association} is immutable! [ActsAsManyTenants]"
+          end
+        end
+
+        define_method "#{association}=" do |models|
+          if new_record?
+            super(models)
+          else
+            raise "#{association} is immutable! [ActsAsManyTenants]"
+          end
+        end
+
+        # TODO override these methods aswell
+        # associations.<<(model), associations.delete(model), associations.clear, associations.build, associations.create
       end
 
-      attr_accessible "#{association.to_s.singularize}_ids".to_sym # e.g. account_ids
-
       if options[:required]
-        validates_presence_of "#{association.to_s.singularize}_ids".to_sym # e.g. account_ids
+        validates_presence_of singular_ids
       end
 
       # set the default_scope to scope to current tenant

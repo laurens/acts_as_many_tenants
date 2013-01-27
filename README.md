@@ -1,8 +1,8 @@
 # Acts As Many Tenants
 
-Based on [acts_as_tenant](http://github.com/ErwinM/acts_as_tenant) this gem allows for a model to belong to many tenants.
+As an extension for [acts_as_tenant](http://github.com/ErwinM/acts_as_tenant) this gem allows for a model to belong to many tenants.
 
-`acts_as_many_tenants` sets up a `has_and_belongs_to_many` relationship to a tenant model and introduces a `default_scope` that checks for the existence of an association to `ActsAsTenant.current_tenant`.
+acts_as_many_tenants sets up a `has_and_belongs_to_many` relationship to a tenant model and introduces a `default_scope` that checks for the existence of an association to `ActsAsTenant.current_tenant`.
 
 ## Usage
 
@@ -45,3 +45,11 @@ At the moment only the `association=[model]` and `association_ids=ids` methods t
 the other association writers `associations.<<(model)`, `associations.delete(model)`, `associations.clear`, `associations.build`, `associations.create`.
 
 Pull Requests welcome!
+
+## Author & Credits
+
+acts_as_many_tenants is written by Laurens Nienhaus as an extension for and inspired by [acts_as_tenant](http://github.com/ErwinM/acts_as_tenant).
+
+## License
+
+Copyright (c) 2013 Laurens Nienhaus, released under the MIT license

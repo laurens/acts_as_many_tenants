@@ -5,6 +5,10 @@ module ActsAsManyTenants
     def acts_as_many_tenants(association = :accounts, options = {})
       options.reverse_merge!({:through => false, :required => false, :immutable => true, :auto => true})
 
+      if options[:through] && options[:required]
+        raise(ArgumentError, ":required cannot be used together with :through [ActsAsManyTenants]") 
+      end
+
       # e.g. account_ids
       singular_ids = "#{association.to_s.singularize}_ids"
 

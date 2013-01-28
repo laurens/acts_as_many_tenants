@@ -19,6 +19,10 @@ For example a `Task` may belong to a `Project` and relate to many accounts throu
 
 ``acts_as_many_tenants(:accounts, :through => :project)``
 
+You can provide a class_name (useful when using namespaces):
+
+``acts_as_many_tenants(:accounts, :through => :project, :class_name => 'Foo::Project)``
+
 Newly created models get the current_tenant assigned if you haven’t assigned any tenants yourself.  
 Pass `:auto => false` to prevent this behaviour:
 

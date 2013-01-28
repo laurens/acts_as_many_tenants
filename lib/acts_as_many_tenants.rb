@@ -3,7 +3,7 @@ module ActsAsManyTenants
   
   module ClassMethods
     def acts_as_many_tenants(association = :accounts, options = {})
-      options.reverse_merge!({:through => false, :required => false, :immutable => true, :auto => true})
+      options.reverse_merge!({:through => false, :required => false, :immutable => true, :auto => true, :class_name => nil})
 
       if options[:through] && options[:required]
         raise(ArgumentError, ":required cannot be used together with :through [ActsAsManyTenants]") 
@@ -13,17 +13,13 @@ module ActsAsManyTenants
       singular_ids = "#{association.to_s.singularize}_ids"
 
       if options[:through]
-        # 'foo/bar_baz' -> Foo::BarBaz
-        through_model = options[:through].to_s.camelize.constantize
+        through_model = (options[:class_name] || options[:through].to_s.camelize).constantize
 
-        # 'foo/bar_baz' -> :bar_baz
-        through_association_name = options[:through].to_s.camelize.demodulize.underscore.to_sym
-
-        has_many association, :through => options[:through]
+        has_many association, :through => options[:through], :class_name => options[:class_name]
         reflection = through_model.reflect_on_association(association)
-        through_reflection = reflect_on_association(through_association_name)
+        through_reflection = reflect_on_association(options[:through])
       else
-        has_and_belongs_to_many association
+        has_and_belongs_to_many association, :class_name => options[:class_name]
         reflection = reflect_on_association(association)
       end
 

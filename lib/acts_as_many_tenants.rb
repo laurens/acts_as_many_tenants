@@ -13,11 +13,11 @@ module ActsAsManyTenants
       singular_ids = "#{association.to_s.singularize}_ids"
 
       if options[:through]
-        through_model = (options[:class_name] || options[:through].to_s.camelize).constantize
-
         has_many association, :through => options[:through], :class_name => options[:class_name]
-        reflection = through_model.reflect_on_association(association)
-        through_reflection = reflect_on_association(options[:through])
+        reflection = reflect_on_association(association)
+
+        source_reflection = reflection.source_reflection
+        through_reflection = reflection.through_reflection
       else
         has_and_belongs_to_many association, :class_name => options[:class_name]
         reflection = reflect_on_association(association)
@@ -68,7 +68,7 @@ module ActsAsManyTenants
       else
         default_scope lambda {
           if ActsAsTenant.current_tenant
-            where("EXISTS (SELECT 1 FROM #{reflection.options[:join_table]} WHERE #{reflection.options[:join_table]}.#{reflection.foreign_key} = #{self.table_name}.#{through_reflection.foreign_key} AND #{reflection.options[:join_table]}.#{reflection.association_foreign_key} = ?)", ActsAsTenant.current_tenant.id)
+            where("EXISTS (SELECT 1 FROM #{source_reflection.options[:join_table]} WHERE #{source_reflection.options[:join_table]}.#{source_reflection.foreign_key} = #{self.table_name}.#{through_reflection.foreign_key} AND #{source_reflection.options[:join_table]}.#{source_reflection.association_foreign_key} = ?)", ActsAsTenant.current_tenant.id)
           end
         }
       end
